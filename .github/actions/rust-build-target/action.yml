@@ -1,0 +1,22 @@
+name: "Install Rustup Architecture and Build"
+description: "install the specified rustup architecture, build the binary and return path to the release folder"
+inputs:
+  arch:
+    description: "Rust Architecture"
+    required: true
+outputs:
+  path:
+    description: "executable parent folder path"
+    value: ${{ steps.path.outputs.path }}
+runs:
+  using: "composite"
+  steps:
+    - id: rustup-add-target
+      shell: bash
+      run: "rustup target add ${{ inputs.arch }}"
+    - id: build
+      shell: bash
+      run: "cargo build --release --target=${{ inputs.arch }}"
+    - id: path
+      run: echo "path=target/${{ inputs.arch }}/release" >> $GITHUB_OUTPUT
+      shell: bash

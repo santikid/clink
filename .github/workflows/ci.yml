@@ -1,0 +1,20 @@
+name: CI
+on:
+  push:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: install rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          override: true
+          components: rustfmt, clippy
+      - name: check formatting
+        run: cargo fmt --all -- --check
+      - name: lint
+        run: cargo clippy -- -Dwarnings
