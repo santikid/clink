@@ -36,7 +36,7 @@ enum Action {
     Link,
     Unlink {
         #[arg(long, short, default_value_t = false)]
-        leave_orphans: bool 
+        leave_orphans: bool,
     },
 }
 
@@ -73,7 +73,9 @@ fn run(action: Action) {
                 let slugs = extract_slugs(&e.file_name().to_string_lossy());
                 match slugs {
                     None => None,
-                    Some(slugs) => enabled_features.get_first_match(&slugs).map(|f| (f, e.path())),
+                    Some(slugs) => enabled_features
+                        .get_first_match(&slugs)
+                        .map(|f| (f, e.path())),
                 }
             })
             .collect::<Vec<_>>();
@@ -112,19 +114,15 @@ fn run(action: Action) {
                 }
             });
 
-    target_links.iter().for_each(|link| {
-        match action {
-            Action::Link => {
-                match link.link() {
-                    Err(e) => panic!("conflicts in target {:?}: {:?}", link.target, e),
-                    Ok(_) => (),
-                }
+    target_links.iter().for_each(|link| match action {
+        Action::Link => {
+            if let Err(e) = link.link() {
+                panic!("conflicts in target {:?}: {:?}", link.target, e)
             }
-            Action::Unlink { leave_orphans } => {
-                match link.unlink(leave_orphans) {
-                    Err(e) => panic!("conflicts in target {:?}: {:?}", link.target, e),
-                    Ok(_) => (),
-                }
+        }
+        Action::Unlink { leave_orphans } => {
+            if let Err(e) = link.unlink(leave_orphans) {
+                panic!("conflicts in target {:?}: {:?}", link.target, e)
             }
         }
     });
