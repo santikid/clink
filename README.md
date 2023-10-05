@@ -1,13 +1,16 @@
-# bootstrapper
+# clink
 
 conditional symlink farm manager
 
 ## Usage
 
+`clink link` - creates symlinks based on Configuration
+
+`clink unlink [-l | --leave-orphans]` - removes symlinks
 
 ## Configuration
 
-Bootstrapper is configured in a `bootstrapper.yaml` file.
+Clink is configured in a `clink.yaml` file.
 
 ```yaml
 features:
@@ -37,6 +40,6 @@ Any directories whose name matches the format `{slug,slug,...}<any name>` get sy
 ## Caveats
 
 While other symlink farms like GNU stow perform "tree folding" to figure out where symlinking is most efficient,
-bootstrapper only symlinks files, creating non-existing parent directories in the process. To avoid leaving
-empty "orphan" folders after unlinking, bootstrapper removes empty directories up until, but not including, the
+clink only symlinks files, creating non-existing parent directories in the process. To avoid leaving
+empty "orphan" folders after unlinking, clink removes empty directories up until, but not including, the
 original target. This behaviour can be overwritten by specifying the --leave-orphans flag with unlink.

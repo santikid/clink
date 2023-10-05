@@ -49,12 +49,12 @@ struct Args {
 
 fn main() {
     let args = Args::parse();
-    bootstrap(args.action);
+    run(args.action);
 }
 
-fn bootstrap(action: Action) {
+fn run(action: Action) {
     // read config and parse it
-    let config = fs::read_to_string("bootstrapper.yaml").expect("could not read config");
+    let config = fs::read_to_string("clink.yaml").expect("could not read config");
     let config: Config = serde_yaml::from_str(&config).expect("could not parse config");
 
     // filter out disabled features
