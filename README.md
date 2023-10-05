@@ -24,7 +24,9 @@ features:
       enabled: linux
       target: ~/
     - slug: custom
-      enabled: /some/custom/script
+      # custom enabled commands have to be tagged with !command
+      # the specified command needs to return exit code 0 to count as enabled
+      enabled: !command /some/custom/script
       target: ~/
 ```
 
