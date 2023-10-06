@@ -91,7 +91,16 @@ impl LinkGroup {
             let path = source.path();
             let target = self.target.join(&source.file);
             println!("linking {:?} to {:?}", path, target);
-            fs::create_dir_all(target.parent().unwrap()).unwrap();
+            fs::create_dir_all(
+                target.parent().expect(
+                    format!(
+                        "could not get parent directory of link {}",
+                        target.display()
+                    )
+                    .as_str(),
+                ),
+            )
+            .expect(format!("could not create parent tree for link {}", target.display()).as_str());
             match symlink(path, target) {
                 Ok(_) => {}
                 Err(e) => {
@@ -109,15 +118,18 @@ impl LinkGroup {
             println!("unlinking {:?}", target);
             match fs::symlink_metadata(&target) {
                 Ok(f) if f.is_symlink() && target.read_link().unwrap() == source.path() => {
-                    fs::remove_file(&target).unwrap();
-                    let mut parent = target.parent().unwrap();
-                    while !leave_orphans
-                        && parent.read_dir().unwrap().count() == 0
-                        && parent != self.target
-                    {
-                        fs::remove_dir(parent).unwrap();
-                        println!("removing {:?}", parent);
-                        parent = parent.parent().unwrap();
+                    fs::remove_file(&target)
+                        .expect(format!("could not remove link {}", target.display()).as_str());
+                    if !leave_orphans {
+                        let mut parent = target.parent().unwrap();
+                        while parent.read_dir().unwrap().count() == 0 && parent != self.target {
+                            fs::remove_dir(parent).unwrap();
+                            println!("removing {:?}", parent);
+                            match parent.parent() {
+                                Some(p) if p != self.target => parent = p,
+                                _ => break,
+                            }
+                        }
                     }
                 }
                 _ => {}
