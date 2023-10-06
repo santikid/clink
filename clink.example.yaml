@@ -1,0 +1,20 @@
+features:
+  - slug: all
+    target: ~/.config
+    enabled: all
+
+  - slug: mac
+    target: ~/.config
+    enabled: macos
+
+  - slug: mac_home
+    target: ~/
+    enabled: macos
+
+  - slug: linux
+    target: ~/.config
+    enabled: linux
+
+  - slug: linux_wayland
+    target: ~/
+    enabled: !command /bin/bash -c "if [[ $XDG_SESSION_TYPE -ne wayland ]] ; then exit 1 ; fi"
