@@ -68,7 +68,7 @@ impl LinkGroup {
                     Err(e) if e.kind() != ErrorKind::NotFound => Some(src.file.clone()),
                     Ok(f) if f.is_symlink() => {
                         let metadata = target.read_link().unwrap();
-                        if metadata != src.file {
+                        if metadata != src.path() {
                             Some(src.file.clone())
                         } else {
                             None
@@ -103,6 +103,7 @@ impl LinkGroup {
             .expect(format!("could not create parent tree for link {}", target.display()).as_str());
             match symlink(path, target) {
                 Ok(_) => {}
+                Err(e) if e.kind() == ErrorKind::AlreadyExists => {}
                 Err(e) => {
                     println!("error: {:?}", e);
                 }
