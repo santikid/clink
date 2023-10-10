@@ -29,8 +29,8 @@ impl LinkGroup {
             sources: Vec::new(),
         }
     }
-    pub fn add_source(&mut self, source: &PathBuf) -> Result<(), Vec<PathBuf>> {
-        let source_files = get_all_paths(source);
+    pub fn add_source(&mut self, source: &PathBuf, ignore: &Vec<String>) -> Result<(), Vec<PathBuf>> {
+        let source_files = get_all_paths(source, ignore);
 
         let sources = source_files
             .iter()
@@ -139,9 +139,10 @@ impl LinkGroup {
         Ok(())
     }
 }
-pub fn get_all_paths(source: &Path) -> HashSet<PathBuf> {
+pub fn get_all_paths(source: &Path, ignore: &Vec<String>) -> HashSet<PathBuf> {
     walkdir::WalkDir::new(source)
         .into_iter()
+        .filter_entry(|e| !ignore.contains(&e.file_name().to_string_lossy().to_string()))
         .filter_map(|e| e.ok())
         .filter(|e| e.file_type().is_file())
         .map(|e| e.path().to_path_buf())

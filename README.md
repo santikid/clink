@@ -15,6 +15,9 @@ either be `all`, the wanted OS (`macos` | `linux`) or a custom command.
 Clink is configured in a `clink.yaml` file.
 
 ```yaml
+ignore:     # ignore file or folder names, applies to all directories and subdirectories
+  - .DS_Store
+
 features:
   - slug: all
     enabled: all # all, macos, linux or custom command

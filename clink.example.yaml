@@ -1,3 +1,7 @@
+ignore: # optional
+  - ".git" # only needed if you have a submodule in your tree
+  - ".DS_Store"
+
 features:
   - slug: all
     target: ~/.config

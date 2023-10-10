@@ -9,6 +9,7 @@ mod link;
 
 #[derive(Debug, serde::Deserialize)]
 struct Config {
+    ignore: Option<Vec<String>>,
     features: feature::FeatureList,
 }
 
@@ -80,6 +81,8 @@ fn run(action: Action) {
             })
             .collect::<Vec<_>>();
 
+    let ignore = config.ignore.unwrap_or_default();
+
     // create LinkGroup for each target
     let target_links =
         source_features
@@ -108,7 +111,7 @@ fn run(action: Action) {
                 };
 
                 // add current directory to LinkGroup
-                match entry.add_source(source) {
+                match entry.add_source(source, &ignore) {
                     Err(e) => panic!("conflicts in target {:?}: {:?}", target, e),
                     Ok(_) => acc,
                 }
