@@ -31,6 +31,15 @@ impl Feature {
 pub struct FeatureList(Vec<Feature>);
 
 impl FeatureList {
+    pub fn filter_slugs(&self, slugs: &[String]) -> FeatureList {
+        FeatureList(
+            self.0
+                .iter()
+                .filter(|f| slugs.contains(&f.slug))
+                .cloned()
+                .collect(),
+        )
+    }
     pub fn filter_enabled(&self) -> FeatureList {
         FeatureList(
             self.0

@@ -34,10 +34,15 @@ fn extract_slugs(name: &str) -> Option<Vec<String>> {
 
 #[derive(Subcommand, Debug)]
 enum Action {
-    Link,
+    Link {
+        #[arg(long, value_delimiter = ',')]
+        override_features: Option<Vec<String>>,
+    },
     Unlink {
         #[arg(long, short, default_value_t = false)]
         leave_orphans: bool,
+        #[arg(long, value_delimiter = ',')]
+        override_features: Option<Vec<String>>,
     },
 }
 
@@ -59,7 +64,20 @@ fn run(action: Action) {
     let config: Config = serde_yaml::from_str(&config).expect("could not parse config");
 
     // filter out disabled features
-    let enabled_features = config.features.filter_enabled();
+    let enabled_features = match action {
+        Action::Link {
+            ref override_features,
+        } if override_features.is_some() => config
+            .features
+            .filter_slugs(&override_features.clone().unwrap()),
+        Action::Unlink {
+            ref override_features,
+            ..
+        } if override_features.is_some() => config
+            .features
+            .filter_slugs(&override_features.clone().unwrap()),
+        _ => config.features.filter_enabled(),
+    };
 
     // get all enabled directories with the highest priority feature
     let source_features =
@@ -118,12 +136,12 @@ fn run(action: Action) {
             });
 
     target_links.iter().for_each(|link| match action {
-        Action::Link => {
+        Action::Link { .. } => {
             if let Err(e) = link.link() {
                 panic!("conflicts in target {:?}: {:?}", link.target, e)
             }
         }
-        Action::Unlink { leave_orphans } => {
+        Action::Unlink { leave_orphans, .. } => {
             if let Err(e) = link.unlink(leave_orphans) {
                 panic!("conflicts in target {:?}: {:?}", link.target, e)
             }
