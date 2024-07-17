@@ -7,6 +7,7 @@ pub enum Enabled {
     MacOS,
     Linux,
     Command(String),
+    None,
 }
 
 #[derive(Debug, serde::Deserialize, Clone)]
@@ -19,6 +20,7 @@ pub struct Feature {
 impl Feature {
     pub fn enabled(&self) -> bool {
         match &self.enabled {
+            Enabled::None => false,
             Enabled::All => true,
             Enabled::MacOS => cfg!(target_os = "macos"),
             Enabled::Linux => cfg!(target_os = "linux"),
